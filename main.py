@@ -1,66 +1,79 @@
-"""Ejecutar con python main.py. No requiere paquetes externos."""
-from datetime import date
-from pathlib import Path
-from archivos import cargar, guardar
-from negocio import registrar, buscar, ordenar, resumen
+"""Ejecutar: py main.py. Prototipo en memoria para gestionar pedidos."""
+from datos import inicial
+from negocio import (crear_generador, registrar, buscar, modificar, eliminar,
+                     burbuja, seleccion, buscar_texto, mostrar, ejemplo_parametros)
 
-RUTA = Path(__file__).parent / 'datos' / 'queseria.json'
-
-
-def mostrar(p):
-    print(f"{p['codigo']} | {p['cliente']} | {p['fecha']} | S/ {p['total']}")
-    for linea in p['detalle']:
-        print(f"  {linea['nombre']}: {linea['kg']} kg x S/ {linea['precio']} = S/ {linea['subtotal']}")
-    print('Constancia interna de venta. No es comprobante tributario.')
-
+def leer_lineas(estado):
+    for i in range(len(estado["ids"])):
+        print(estado["ids"][i], estado["nombres"][i],
+              "S/", estado["precios"][i], "Disponible:", estado["stock"][i], "kg")
+    lineas = []
+    while True:
+        producto = input("Producto (Enter termina): ").strip()
+        if not producto:
+            return lineas
+        lineas.append([int(producto), input("Cantidad en kg: ")])
 
 def main():
-    try:
-        estado = cargar(RUTA)
-    except (OSError, ValueError) as e:
-        print('No se puede iniciar:', e)
-        return
-    print('QUESERÍA LOS ALPES - PROTOTIPO ACADÉMICO')
-    print('Catálogo inicial de demostración. Usar una sola instancia.')
+    estado = inicial()
+    generar = crear_generador()
+    print("DESAFÍO DE PROGRAMACIÓN — QUESERÍA LOS ALPES")
+    print("Pedidos borrador. Datos de demostración; se pierden al salir.")
     while True:
+        print("1 Registrar | 2 Buscar código | 3 Modificar | 4 Eliminar")
+        print("5 Burbuja por código | 6 Selección por cliente | 7 Buscar texto")
+        print("8 Stock | 9 Ejemplo de parámetros | 0 Salir")
+        opcion = input("Opción: ").strip()
         try:
-            print('\n1 Registrar  2 Buscar  3 Ordenar  4 Inventario  5 Resumen de hoy  0 Salir')
-            opcion = input('Opción: ').strip()
-            if opcion == '0':
+            if opcion == "0":
                 break
-            if opcion == '1':
-                cliente = input('Cliente: ')
-                canal = input('Canal (presencial/telefónico): ')
-                lineas = []
-                while True:
-                    producto = input('Producto 1 fresco, 2 mantecoso, 3 suizo, 4 mantequilla; 0 terminar: ')
-                    if producto.strip() == '0':
-                        break
-                    lineas.append((int(producto), input('Cantidad en kg: ')))
-                pedido = registrar(estado, cliente, canal, lineas, lambda d: guardar(RUTA, d))
+            elif opcion in ("1", "3"):
+                codigo = input("Código: ") if opcion == "3" else None
+                cliente = input("Cliente: ")
+                canal = input("Canal (presencial/telefónico): ")
+                lineas = leer_lineas(estado)
+                if opcion == "1":
+                    pedido = registrar(estado, generar, cliente, canal, lineas)
+                else:
+                    pedido = modificar(estado, codigo, cliente, canal, lineas)
                 mostrar(pedido)
-            elif opcion == '2':
-                pedido = buscar(estado['pedidos'], input('Código: '))
-                mostrar(pedido) if pedido else print('Pedido no encontrado.')
-            elif opcion == '3':
-                for p in ordenar(estado['pedidos']):
-                    mostrar(p)
-                if not estado['pedidos']:
-                    print('No hay pedidos.')
-            elif opcion == '4':
-                for p in estado['productos']:
-                    print(f"{p['id']} {p['nombre']}: {p['stock']} kg | S/ {p['precio']}/kg")
-            elif opcion == '5':
-                n, total = resumen(estado, date.today().isoformat())
-                print(f'Hoy: {n} pedidos | Recaudación: S/ {total:.2f}')
+            elif opcion == "2":
+                pedido = buscar(estado["pedidos"], input("Código: "))
+                if pedido is None:
+                    print("No encontrado.")
+                else:
+                    mostrar(pedido)
+            elif opcion == "4":
+                codigo = input("Código del borrador: ")
+                if input("¿Eliminar y liberar reserva? (s/n): ").strip().casefold() == "s":
+                    eliminar(estado, codigo)
+                    print("Borrador eliminado y stock liberado.")
+            elif opcion in ("5", "6", "7"):
+                if opcion == "5":
+                    resultado = burbuja(estado["pedidos"])
+                elif opcion == "6":
+                    resultado = seleccion(estado["pedidos"])
+                else:
+                    resultado = buscar_texto(estado["pedidos"], input("Nombre o parte: "))
+                for pedido in resultado:
+                    mostrar(pedido)
+                if not resultado:
+                    print("Sin resultados.")
+            elif opcion == "8":
+                for i in range(len(estado["ids"])):
+                    print(estado["nombres"][i], estado["stock"][i], "kg disponibles")
+            elif opcion == "9":
+                print(ejemplo_parametros())
             else:
-                print('Opción inválida.')
-        except (ValueError, OSError) as e:
-            print('Operación rechazada:', e)
+                print("Opción inválida.")
+        except ValueError as error:
+            print("Operación rechazada:", error)
         except (EOFError, KeyboardInterrupt):
-            print('\nCierre solicitado. Los pedidos confirmados ya están guardados.')
+            print("Entrada interrumpida.")
             break
 
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    try:
+        main()
+    except (EOFError, KeyboardInterrupt):
+        print("\nFin del programa.")
