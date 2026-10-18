@@ -20,30 +20,36 @@ stock = [20.0, 15.0, 12.0, 25.0]
 pedidos = []
 
 
-# FUNCIÓN PARA MOSTRAR EL MENÚ
+# FUNCIÓN PARA MOSTRAR EL MENÚ PRINCIPAL
 def mostrar_menu():
-    print("\n" + "=" * 48)
-    print("      SISTEMA DE PEDIDOS - QUESERÍA LOS ALPES")
-    print("=" * 48)
+    print("\n" + "=" * 50)
+    print("       QUESERÍA LOS ALPES - CAJAMARCA")
+    print("       SISTEMA DE PEDIDOS E INVENTARIO")
+    print("=" * 50)
     print("1. Registrar nuevo pedido")
     print("2. Buscar pedido por código")
     print("3. Listar pedidos ordenados")
-    print("4. Ver inventario actual")
-    print("5. Mostrar resumen del día")
-    print("0. Salir")
-    print("=" * 48)
+    print("4. Consultar inventario disponible")
+    print("5. Consultar resumen de pedidos")
+    print("0. Salir del sistema")
+    print("=" * 50)
 
 
-# FUNCIÓN PARA MOSTRAR LOS PRODUCTOS
+# FUNCIÓN PARA MOSTRAR EL CATÁLOGO
 def mostrar_productos():
     print("\n--- CATÁLOGO DE PRODUCTOS ---")
+    print(f"{'N°':<5}{'PRODUCTO':<22}{'PRECIO/KG':<13}{'STOCK'}")
+    print("-" * 55)
 
     for i in range(len(productos)):
         print(
-            f"{i + 1}. {productos[i]} "
-            f"| S/ {precios[i]:.2f}/kg "
-            f"| Stock: {stock[i]:.2f} kg"
+            f"{i + 1:<5}"
+            f"{productos[i]:<22}"
+            f"S/ {precios[i]:<10.2f}"
+            f"{stock[i]:.2f} kg"
         )
+
+    print("-" * 55)
 
 
 # FUNCIÓN PARA REGISTRAR UN PEDIDO
