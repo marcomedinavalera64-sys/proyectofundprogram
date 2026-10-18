@@ -127,9 +127,9 @@ def registrar_pedido():
 def buscar_pedido():
     print("\n--- BUSCAR PEDIDO ---")
 
-    codigo = input(
-        "Ingrese el código del pedido: "
-    ).strip().upper()
+codigo = input(
+    "Ingrese el código del pedido: "
+).strip().upper().replace(" ", "")
 
     encontrado = False
 
