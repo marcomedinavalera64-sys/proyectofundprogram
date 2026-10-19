@@ -252,3 +252,40 @@ def main():
 # INICIO DEL PROGRAMA
 if __name__ == "__main__":
     main()
+    
+# FUNCIÓN PARA CONSULTAR INVENTARIO
+def consultar_inventario():
+    print("\n--- INVENTARIO ACTUAL ---")
+    print(f"{'PRODUCTO':<22}{'STOCK':<15}{'PRECIO/KG'}")
+    print("-" * 52)
+
+    for i in range(len(productos)):
+        print(
+            f"{productos[i]:<22}"
+            f"{stock[i]:<15.2f}"
+            f"S/ {precios[i]:.2f}"
+        )
+
+    print("-" * 52)
+
+    productos_agotados = sum(
+        1 for cantidad in stock if cantidad <= 0
+    )
+    print(f"Productos agotados: {productos_agotados}")
+
+
+# FUNCIÓN PARA MOSTRAR RESUMEN
+def mostrar_resumen():
+    print("\n--- RESUMEN DE PEDIDOS ---")
+
+    cantidad_pedidos = len(pedidos)
+    total_acumulado = sum(
+        pedido["total"] for pedido in pedidos
+    )
+    kilos_solicitados = sum(
+        pedido["cantidad"] for pedido in pedidos
+    )
+
+    print(f"Pedidos registrados: {cantidad_pedidos}")
+    print(f"Cantidad total solicitada: {kilos_solicitados:.2f} kg")
+    print(f"Importe acumulado: S/ {total_acumulado:.2f}")
