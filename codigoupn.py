@@ -1,4 +1,3 @@
-
 # =====================================================
 # SISTEMA DE PEDIDOS - QUESERÍA LOS ALPES
 # Curso: Fundamentos de Programación
@@ -127,9 +126,9 @@ def registrar_pedido():
 def buscar_pedido():
     print("\n--- BUSCAR PEDIDO ---")
 
-codigo = input(
-    "Ingrese el código del pedido: "
-).strip().upper().replace(" ", "")
+    codigo = input(
+        "Ingrese el código del pedido: "
+    ).strip().upper()
 
     encontrado = False
 
